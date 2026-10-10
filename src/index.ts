@@ -30,3 +30,16 @@ export type { ITenantResolver } from "./provider/tenant-resolver.js";
 export type { IIdentityProviderPack } from "./provider/identity-provider-pack.js";
 export { IdentityProviderRegistryKey } from "./provider/identity-provider-registry.js";
 export type { IIdentityProviderRegistry } from "./provider/identity-provider-registry.js";
+
+export {
+    FakeAuthenticator,
+    FakeSessionManager,
+    FakePrincipalDirectory,
+    FakeRoleGrantStore,
+    FakeAccessPolicy,
+    FakeAuditSink,
+    FakeIdentityProviderPack,
+    FakeIdentityProviderRegistry,
+    FakeTenant,
+} from "./testing/fakes.js";
+export { IdentityPackConformance } from "./testing/provider-pack-conformance.js";
