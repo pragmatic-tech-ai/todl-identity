@@ -1,0 +1,39 @@
+{
+  "name": "@pragmatic-tech-ai/todl-identity",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "Identity management contracts for the TODL engine: principal/tenant/session value types and swappable provider-pack seams.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "tsx --conditions=development --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@pragmatic-tech-ai/todl-runtime": "^0.7.0"
+  }
+}
