@@ -36,3 +36,7 @@ export { SecretStoreKey } from "./authn/secret-store.js";
 export type { ISecretStore } from "./authn/secret-store.js";
 export { PasswordHasherKey } from "./authn/password-hasher.js";
 export type { IPasswordHasher } from "./authn/password-hasher.js";
+export { LocalAccount } from "./authn/local-account-store.js";
+export type { ILocalAccountStore } from "./authn/local-account-store.js";
+export { ServiceTokenGrant } from "./authn/service-token-store.js";
+export type { IServiceTokenStore } from "./authn/service-token-store.js";
