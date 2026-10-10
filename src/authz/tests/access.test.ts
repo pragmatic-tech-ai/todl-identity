@@ -13,10 +13,7 @@ test("Deny is closed with no filter", () =>
 
 test("Allow carries an optional entity filter", () =>
 {
-    const everything: EntityPredicate =
-    {
-        Matches: (_e: EntityView) => true,
-    };
+    const everything: EntityPredicate = { Matches: (_e: EntityView) => true };
     const open = AccessDecision.Allow("role grant");
     const filtered = AccessDecision.Allow("role grant", everything);
     assert.equal(open.Allowed, true);
