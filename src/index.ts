@@ -30,3 +30,4 @@ export type { ITenantResolver } from "./provider/tenant-resolver.js";
 export type { IIdentityProviderPack } from "./provider/identity-provider-pack.js";
 export { IdentityProviderRegistryKey } from "./provider/identity-provider-registry.js";
 export type { IIdentityProviderRegistry } from "./provider/identity-provider-registry.js";
+export { ResourceAuthorizationPolicy } from "./authz/resource-authorization-policy.js";
