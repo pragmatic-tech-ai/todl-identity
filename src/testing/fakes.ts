@@ -9,6 +9,7 @@ import {
     AuthenticationResult,
     RejectedResult,
 } from "../authn/authentication-result.js";
+import type { PresentedSecret } from "../authn/presented-secret.js";
 import type { IAuthenticator } from "../authn/authenticator.js";
 import type { ISessionManager } from "../authn/session-manager.js";
 import type { IPrincipalDirectory } from "../authn/principal-directory.js";
@@ -26,16 +27,16 @@ import type { IIdentityProviderRegistry } from "../provider/identity-provider-re
 
 export class FakeAuthenticator implements IAuthenticator
 {
-    private static readonly AcceptedReference = "accept";
+    private static readonly AcceptanceToken = "accept";
     private static readonly RejectionReason = "fake rejection";
 
     public constructor(public readonly Method: AuthMethod, private readonly principal: Principal)
     {
     }
 
-    public async Authenticate(credential: Credential, _tenant: Tenant): Promise<AuthenticationResult>
+    public async Authenticate(_credential: Credential, presented: PresentedSecret, _tenant: Tenant): Promise<AuthenticationResult>
     {
-        if (credential.Reference === FakeAuthenticator.AcceptedReference)
+        if (presented.Reveal() === FakeAuthenticator.AcceptanceToken)
         {
             return new AuthenticatedResult(this.principal);
         }
