@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DelegationDepth } from "../core/identity-enums.js";
-import { PrincipalKind } from "../core/identity-enums.js";
+import { DelegationDepth, PrincipalKind } from "../core/identity-enums.js";
 import { Principal } from "../core/principal.js";
 import type { IIdentityProviderPack } from "../provider/identity-provider-pack.js";
 

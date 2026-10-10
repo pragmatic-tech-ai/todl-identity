@@ -27,6 +27,7 @@ import type { IIdentityProviderRegistry } from "../provider/identity-provider-re
 export class FakeAuthenticator implements IAuthenticator
 {
     private static readonly AcceptedReference = "accept";
+    private static readonly RejectionReason = "fake rejection";
 
     public constructor(public readonly Method: AuthMethod, private readonly principal: Principal)
     {
@@ -39,7 +40,7 @@ export class FakeAuthenticator implements IAuthenticator
             return new AuthenticatedResult(this.principal);
         }
 
-        return new RejectedResult("fake rejection");
+        return new RejectedResult(FakeAuthenticator.RejectionReason);
     }
 }
 
