@@ -31,3 +31,8 @@ export type { IIdentityProviderPack } from "./provider/identity-provider-pack.js
 export { IdentityProviderRegistryKey } from "./provider/identity-provider-registry.js";
 export type { IIdentityProviderRegistry } from "./provider/identity-provider-registry.js";
 export { ResourceAuthorizationPolicy } from "./authz/resource-authorization-policy.js";
+export { PresentedSecret } from "./authn/presented-secret.js";
+export { SecretStoreKey } from "./authn/secret-store.js";
+export type { ISecretStore } from "./authn/secret-store.js";
+export { PasswordHasherKey } from "./authn/password-hasher.js";
+export type { IPasswordHasher } from "./authn/password-hasher.js";
