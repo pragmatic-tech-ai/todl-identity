@@ -28,6 +28,7 @@ export { TenantConfigStoreKey } from "./provider/tenant-config-store.js";
 export type { ITenantConfigStore } from "./provider/tenant-config-store.js";
 export type { ITenantResolver } from "./provider/tenant-resolver.js";
 export type { IIdentityProviderPack } from "./provider/identity-provider-pack.js";
+export type { IdentityStoreSet } from "./provider/identity-store-set.js";
 export { IdentityProviderRegistryKey } from "./provider/identity-provider-registry.js";
 export type { IIdentityProviderRegistry } from "./provider/identity-provider-registry.js";
 export { ResourceAuthorizationPolicy } from "./authz/resource-authorization-policy.js";
