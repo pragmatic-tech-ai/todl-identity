@@ -62,4 +62,69 @@ export interface ISecurityModelConfig
     readonly teams: readonly ITeamConfig[];
     readonly membership: IMembershipConfig;
     readonly ownershipRules: readonly IOwnershipRuleConfig[];
+    readonly roles?: readonly IRoleConfig[];
+    readonly roleAssignment?: IRoleAssignmentConfig;
+}
+
+// --- SP-3a: roles, privileges, role assignment ---
+
+export enum PrivilegeAction
+{
+    Create = "create",
+    Read = "read",
+    Update = "update",
+    Delete = "delete",
+    Append = "append",
+    AppendTo = "appendTo",
+    Assign = "assign",
+    Share = "share",
+}
+
+export enum AccessLevel
+{
+    None = "none",
+    User = "user",
+    BusinessUnit = "businessUnit",
+    BusinessUnitAndChildren = "businessUnitAndChildren",
+    Organization = "organization",
+}
+
+export interface IPrivilegeConfig
+{
+    readonly action: PrivilegeAction;
+    readonly concept: string;
+    readonly level: AccessLevel;
+}
+
+export interface IRoleConfig
+{
+    readonly id: string;
+    readonly name: string;
+    readonly privileges: readonly IPrivilegeConfig[];
+}
+
+export interface IRoleClaimRule
+{
+    readonly claim: string;
+    readonly value: string;
+    readonly roles: readonly string[];
+}
+
+export interface IRoleOverride
+{
+    readonly principalId: string;
+    readonly roles: readonly string[];
+}
+
+export interface ITeamRoleGrant
+{
+    readonly teamId: string;
+    readonly roles: readonly string[];
+}
+
+export interface IRoleAssignmentConfig
+{
+    readonly claimsMapping: readonly IRoleClaimRule[];
+    readonly overrides: readonly IRoleOverride[];
+    readonly teamRoles: readonly ITeamRoleGrant[];
 }
