@@ -5,4 +5,5 @@ export interface IRoleGrantStore
 {
     GrantsFor(subject: string, tenant: Tenant): Promise<readonly Grant[]>;
     Save(grant: Grant): Promise<void>;
+    Revoke(grant: Grant): Promise<void>;
 }
