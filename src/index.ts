@@ -25,6 +25,17 @@ export type { IRoleGrantStore } from "./authn/role-grant-store.js";
 export { AuditEvent, AuditEventKind } from "./provider/audit-sink.js";
 export type { IAuditSink } from "./provider/audit-sink.js";
 export { IdentityConfig } from "./provider/identity-config.js";
+export { OwnershipSourceKind } from "./security/security-model-config.js";
+export type {
+    IBusinessUnitConfig,
+    ITeamConfig,
+    IMembershipClaimRule,
+    IMembershipOverride,
+    IMembershipConfig,
+    IOwnershipSource,
+    IOwnershipRuleConfig,
+    ISecurityModelConfig,
+} from "./security/security-model-config.js";
 export { TenantConfigStoreKey } from "./provider/tenant-config-store.js";
 export type { ITenantConfigStore } from "./provider/tenant-config-store.js";
 export type { ITenantResolver } from "./provider/tenant-resolver.js";
