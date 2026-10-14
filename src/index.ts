@@ -20,6 +20,7 @@ export {
 export type { IAuthenticator } from "./authn/authenticator.js";
 export type { ISessionManager } from "./authn/session-manager.js";
 export type { IPrincipalDirectory } from "./authn/principal-directory.js";
+export { RoleCapabilities } from "./authz/role-capabilities.js";
 export type { IRoleGrantStore } from "./authn/role-grant-store.js";
 export { AuditEvent, AuditEventKind } from "./provider/audit-sink.js";
 export type { IAuditSink } from "./provider/audit-sink.js";

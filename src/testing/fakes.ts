@@ -115,6 +115,15 @@ export class FakeRoleGrantStore implements IRoleGrantStore
         this.grants.push(...kept);
     }
 
+    public async GrantsOn(resource: ResourceRef): Promise<readonly Grant[]>
+    {
+        return this.grants.filter((grant) =>
+            grant.Resource.Kind === resource.Kind
+            && grant.Resource.TenantId === resource.TenantId
+            && grant.Resource.Path.length === resource.Path.length
+            && grant.Resource.Path.every((segment, index) => segment === resource.Path[index]));
+    }
+
     private static Matches(a: Grant, b: Grant): boolean
     {
         return a.Subject === b.Subject && a.Role === b.Role && a.Resource.Kind === b.Resource.Kind && a.Resource.TenantId === b.Resource.TenantId && a.Resource.Path.length === b.Resource.Path.length && a.Resource.Path.every((p, i) => p === b.Resource.Path[i]);

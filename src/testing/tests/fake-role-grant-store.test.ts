@@ -43,3 +43,18 @@ test("FakeRoleGrantStore.Revoke is a no-op when no grant matches", async () =>
     assert.equal(remaining.length, 1);
     assert.equal(remaining[0]!.Role, Role.Viewer);
 });
+
+test("FakeRoleGrantStore.GrantsOn returns only the queried tenant's tenant-root grants", async () =>
+{
+    const store = new FakeRoleGrantStore();
+    await store.Save(new Grant("a1", Role.Admin, new ResourceRef(ResourceKind.Tenant, "t1", [])));
+    await store.Save(new Grant("o1", Role.Owner, new ResourceRef(ResourceKind.Tenant, "t1", [])));
+    await store.Save(new Grant("a2", Role.Admin, new ResourceRef(ResourceKind.Tenant, "t2", [])));
+    await store.Save(new Grant("p1", Role.Admin, new ResourceRef(ResourceKind.Project, "t1", ["proj"])));
+
+    const onRoot = await store.GrantsOn(new ResourceRef(ResourceKind.Tenant, "t1", []));
+
+    assert.deepEqual(onRoot.map((g) => g.Subject).sort(), ["a1", "o1"]);
+    const onProject = await store.GrantsOn(new ResourceRef(ResourceKind.Project, "t1", ["proj"]));
+    assert.deepEqual(onProject.map((g) => g.Subject), ["p1"]);
+});
