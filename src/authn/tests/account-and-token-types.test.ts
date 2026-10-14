@@ -5,7 +5,7 @@ import { ServiceTokenGrant } from "../service-token-store.js";
 
 test("LocalAccount carries its readonly fields", () =>
 {
-    const account = new LocalAccount("p1", "t1", "a@x.io", "t1/pwhash/p1");
+    const account = new LocalAccount("p1", "t1", "a@x.io", "t1/pwhash/p1", false);
     assert.equal(account.PrincipalId, "p1");
     assert.equal(account.Email, "a@x.io");
     assert.equal(account.SecretRef, "t1/pwhash/p1");
