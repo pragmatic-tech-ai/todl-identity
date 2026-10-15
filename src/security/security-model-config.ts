@@ -64,6 +64,7 @@ export interface ISecurityModelConfig
     readonly ownershipRules: readonly IOwnershipRuleConfig[];
     readonly roles?: readonly IRoleConfig[];
     readonly roleAssignment?: IRoleAssignmentConfig;
+    readonly fieldSecurity?: IFieldSecurityConfig;
 }
 
 // --- SP-3a: roles, privileges, role assignment ---
@@ -127,4 +128,61 @@ export interface IRoleAssignmentConfig
     readonly claimsMapping: readonly IRoleClaimRule[];
     readonly overrides: readonly IRoleOverride[];
     readonly teamRoles: readonly ITeamRoleGrant[];
+}
+
+// --- SP-4: field-level security (field security profiles) ---
+
+export interface ISecuredFieldConfig
+{
+    readonly concept: string;
+    readonly field: string;
+}
+
+export interface IFieldGrantConfig
+{
+    readonly concept: string;
+    readonly field: string;
+    readonly read?: boolean;
+    readonly update?: boolean;
+    readonly create?: boolean;
+}
+
+export interface IFieldProfileConfig
+{
+    readonly id: string;
+    readonly name: string;
+    readonly grants: readonly IFieldGrantConfig[];
+}
+
+export interface IFieldProfileClaimRule
+{
+    readonly claim: string;
+    readonly value: string;
+    readonly profiles: readonly string[];
+}
+
+export interface IFieldProfileOverride
+{
+    readonly principalId: string;
+    readonly profiles: readonly string[];
+}
+
+export interface IFieldProfileTeamGrant
+{
+    readonly teamId: string;
+    readonly profiles: readonly string[];
+}
+
+export interface IFieldProfileAssignmentConfig
+{
+    readonly claimsMapping: readonly IFieldProfileClaimRule[];
+    readonly overrides: readonly IFieldProfileOverride[];
+    readonly teamProfiles: readonly IFieldProfileTeamGrant[];
+}
+
+export interface IFieldSecurityConfig
+{
+    readonly securedFields: readonly ISecuredFieldConfig[];
+    readonly profiles: readonly IFieldProfileConfig[];
+    readonly profileAssignment: IFieldProfileAssignmentConfig;
 }

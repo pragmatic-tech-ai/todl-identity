@@ -41,6 +41,14 @@ export type {
     IRoleOverride,
     ITeamRoleGrant,
     IRoleAssignmentConfig,
+    ISecuredFieldConfig,
+    IFieldGrantConfig,
+    IFieldProfileConfig,
+    IFieldProfileClaimRule,
+    IFieldProfileOverride,
+    IFieldProfileTeamGrant,
+    IFieldProfileAssignmentConfig,
+    IFieldSecurityConfig,
 } from "./security/security-model-config.js";
 export { TenantConfigStoreKey } from "./provider/tenant-config-store.js";
 export type { ITenantConfigStore } from "./provider/tenant-config-store.js";
