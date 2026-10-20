@@ -14,7 +14,6 @@ test("role capability boundaries", () =>
     assert.equal(RoleCapabilities.Covers(Role.Owner, Action.Connect), true);
 });
 
-
 test("maker covers only contribute", () =>
 {
     assert.equal(RoleCapabilities.Covers(Role.Maker, Action.Contribute), true);
