@@ -6,8 +6,9 @@ export class RoleCapabilities
     [
         [Role.Viewer, new Set([Action.Read])],
         [Role.Editor, new Set([Action.Read, Action.Write])],
-        [Role.Admin, new Set([Action.Read, Action.Write, Action.Delete, Action.Administer])],
-        [Role.Owner, new Set([Action.Read, Action.Write, Action.Delete, Action.Administer, Action.Connect])],
+        [Role.Admin, new Set([Action.Read, Action.Write, Action.Delete, Action.Administer, Action.Contribute])],
+        [Role.Owner, new Set([Action.Read, Action.Write, Action.Delete, Action.Administer, Action.Connect, Action.Contribute])],
+        [Role.Maker, new Set([Action.Contribute])],
     ]);
 
     public static Covers(role: Role, action: Action): boolean

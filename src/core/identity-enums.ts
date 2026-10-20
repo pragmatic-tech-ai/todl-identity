@@ -17,6 +17,7 @@ export enum Role
     Editor,
     Admin,
     Owner,
+    Maker,
 }
 
 export enum Action
@@ -26,6 +27,7 @@ export enum Action
     Delete,
     Administer,
     Connect,
+    Contribute,
 }
 
 export enum ResourceKind
