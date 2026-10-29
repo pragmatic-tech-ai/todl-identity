@@ -75,6 +75,17 @@ export class FakeSessionManager implements ISessionManager
     {
         this.sessions.delete(sessionId);
     }
+
+    public async RevokeAllFor(principalId: string): Promise<void>
+    {
+        for (const [id, session] of [...this.sessions])
+        {
+            if (session.PrincipalId === principalId)
+            {
+                this.sessions.delete(id);
+            }
+        }
+    }
 }
 
 export class FakePrincipalDirectory implements IPrincipalDirectory

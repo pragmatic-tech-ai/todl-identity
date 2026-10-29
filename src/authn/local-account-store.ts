@@ -27,5 +27,6 @@ export interface ILocalAccountStore
     FindByEmail(tenant: Tenant, email: string): Promise<LocalAccount | null>;
     FindByPrincipalId(tenant: Tenant, principalId: string): Promise<LocalAccount | null>;
     Disable(tenant: Tenant, principalId: string): Promise<void>;
+    Enable(tenant: Tenant, principalId: string): Promise<void>;
     ListAccounts(tenant: Tenant): Promise<readonly LocalAccount[]>;
 }
