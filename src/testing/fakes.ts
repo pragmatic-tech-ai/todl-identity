@@ -76,11 +76,11 @@ export class FakeSessionManager implements ISessionManager
         this.sessions.delete(sessionId);
     }
 
-    public async RevokeAllFor(principalId: string): Promise<void>
+    public async RevokeAllFor(tenant: Tenant, principalId: string): Promise<void>
     {
         for (const [id, session] of [...this.sessions])
         {
-            if (session.PrincipalId === principalId)
+            if (session.PrincipalId === principalId && session.TenantId === tenant.Id)
             {
                 this.sessions.delete(id);
             }
