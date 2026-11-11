@@ -38,9 +38,11 @@ class ThrowingSource implements IIdpDirectorySource
 class RecordingSessions extends FakeSessionManager
 {
     public readonly Revoked: string[] = [];
+    public FailRevoke = false;
 
     public override async RevokeAllFor(tenant: Tenant, principalId: string): Promise<void>
     {
+        if (this.FailRevoke) throw new Error("revoke down");
         this.Revoked.push(principalId);
         await super.RevokeAllFor(tenant, principalId);
     }
@@ -118,5 +120,18 @@ test("a failing source leaves the stored snapshot untouched and rethrows", async
     await store.Save(tenant.Id, previous);
     const sync = new IdpDirectorySync(new ThrowingSource(), store, new FakeSessionManager(), new FakeAuditSink());
     await assert.rejects(() => sync.Run(tenant, Fixture.Config()), /idp down/);
+    assert.equal(await store.Get(tenant.Id), previous);
+});
+
+test("a failing revocation leaves the stored snapshot untouched so the next run retries", async () =>
+{
+    const tenant = FakeTenant.Saas();
+    const store = new MapStore();
+    const previous = Fixture.Snapshot(IdpUserState.Enabled);
+    await store.Save(tenant.Id, previous);
+    const sessions = new RecordingSessions();
+    sessions.FailRevoke = true;
+    const sync = new IdpDirectorySync(new FakeIdpDirectorySource(Fixture.Snapshot(IdpUserState.Disabled)), store, sessions, new FakeAuditSink());
+    await assert.rejects(() => sync.Run(tenant, Fixture.Config()), /revoke down/);
     assert.equal(await store.Get(tenant.Id), previous);
 });

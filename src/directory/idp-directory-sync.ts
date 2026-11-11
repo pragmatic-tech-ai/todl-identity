@@ -48,8 +48,8 @@ export class IdpDirectorySync
             const before = previous?.StateOf(principalId) ?? IdpUserState.Unknown;
             if (!IdpDirectorySync.IsGone(before)) deprovisioned.push(principalId);
         }
-        await this.store.Save(tenant.Id, snapshot);
         for (const principalId of deprovisioned) await this.sessions.RevokeAllFor(tenant, principalId);
+        await this.store.Save(tenant.Id, snapshot);
         const detail = new Map<string, string>([
             [IdpDirectorySync.UsersKey, String(snapshot.Users().size)],
             [IdpDirectorySync.GroupsKey, String(snapshot.Groups().size)],
