@@ -17,13 +17,20 @@ export class SystemPrincipal
         return new Principal(SystemPrincipal.IdFor(environmentId), environmentId, PrincipalKind.System, new Map(), []);
     }
 
-    public static IsId(principalId: string): boolean
+    /** Exactly the system principal id of that environment; an empty environment id matches nothing. */
+    public static IsId(principalId: string, environmentId: string): boolean
+    {
+        return !!environmentId && principalId === SystemPrincipal.Prefix + environmentId;
+    }
+
+    /** Whether the id falls in the reserved system namespace; no account or external identity may take such an id. */
+    public static IsReserved(principalId: string): boolean
     {
         return principalId.startsWith(SystemPrincipal.Prefix);
     }
 
     public static Is(principal: Principal): boolean
     {
-        return principal.Kind === PrincipalKind.System && SystemPrincipal.IsId(principal.Id);
+        return principal.Kind === PrincipalKind.System && SystemPrincipal.IsId(principal.Id, principal.TenantId);
     }
 }

@@ -61,7 +61,8 @@ export { IdpUserState, IdpDirectorySnapshot } from "./directory/idp-directory-sn
 export { MembershipOrigin, TeamMembershipRow, TeamMembershipRows } from "./directory/team-membership-rows.js";
 export { IdpDirectoryRequest } from "./directory/idp-directory-source.js";
 export type { IIdpDirectorySource } from "./directory/idp-directory-source.js";
-export { IdpDirectoryStoreKey } from "./directory/idp-directory-store.js";
+export { IdpDirectoryStoreKey, UnreadableIdpDirectoryRecordError } from "./directory/idp-directory-store.js";
+export { NonAuthoritativeDirectorySource } from "./directory/non-authoritative-directory-source.js";
 export type { IIdpDirectoryStore } from "./directory/idp-directory-store.js";
 export { IdpDirectorySync, IdpDirectorySyncResult } from "./directory/idp-directory-sync.js";
 export { LocalGroup, LocalGroupNotFoundError } from "./authn/local-group-store.js";

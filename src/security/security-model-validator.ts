@@ -15,6 +15,8 @@ export enum SecurityModelIssueCode
     UnknownAction = "unknownAction",
     UnknownLevel = "unknownLevel",
     DuplicateOverride = "duplicateOverride",
+    MalformedSection = "malformedSection",
+    InvalidValue = "invalidValue",
 }
 
 export class SecurityModelIssue
@@ -44,6 +46,18 @@ export class InvalidSecurityModelError extends Error
     }
 }
 
+/** The field types one section's entries must carry; checked before any semantic rule so a malformed record reports, never throws. */
+class SectionShape
+{
+    public constructor(
+        public readonly Strings: readonly string[],
+        public readonly OptionalStrings: readonly string[],
+        public readonly StringLists: readonly string[],
+        public readonly Booleans: readonly string[])
+    {
+    }
+}
+
 interface IAssignmentView
 {
     readonly name: string;
@@ -53,9 +67,6 @@ interface IAssignmentView
 
 export class SecurityModelValidator
 {
-    private static readonly Sections: ReadonlySet<string> = new Set([
-        "businessUnits", "users", "teams", "roleAssignments", "profileAssignments", "roleOverrides", "profileOverrides",
-    ]);
     private static readonly BusinessUnitsPath = "businessUnits";
     private static readonly UsersPath = "users";
     private static readonly TeamsPath = "teams";
@@ -63,6 +74,17 @@ export class SecurityModelValidator
     private static readonly ProfileAssignmentsPath = "profileAssignments";
     private static readonly RoleOverridesPath = "roleOverrides";
     private static readonly ProfileOverridesPath = "profileOverrides";
+    private static readonly Shapes: ReadonlyMap<string, SectionShape> = new Map([
+        [SecurityModelValidator.BusinessUnitsPath, new SectionShape(["id", "name"], ["parent"], [], [])],
+        [SecurityModelValidator.UsersPath, new SectionShape(["principalId", "businessUnitId"], [], [], [])],
+        [SecurityModelValidator.TeamsPath, new SectionShape(["id", "name", "businessUnitId"], [], ["idpGroups", "manualMembers"], [])],
+        [SecurityModelValidator.RoleAssignmentsPath, new SectionShape(["role"], [], ["principalIds", "teamIds"], [])],
+        [SecurityModelValidator.ProfileAssignmentsPath, new SectionShape(["profile"], [], ["principalIds", "teamIds"], [])],
+        [SecurityModelValidator.RoleOverridesPath, new SectionShape(["role", "concept", "action", "level"], [], [], [])],
+        [SecurityModelValidator.ProfileOverridesPath, new SectionShape(["profile", "concept", "field"], [], [], ["read", "update", "create"])],
+    ]);
+    private static readonly RootPath = "";
+    private static readonly FieldSeparator = ".";
     private static readonly PrincipalIdSuffix = ".principalId";
     private static readonly BusinessUnitIdSuffix = ".businessUnitId";
     private static readonly IdSuffix = ".id";
@@ -87,6 +109,12 @@ export class SecurityModelValidator
     private static readonly UnknownActionMessage = "unknown privilege action: ";
     private static readonly UnknownLevelMessage = "unknown access level: ";
     private static readonly DuplicateOverrideMessage = "override is duplicated: ";
+    private static readonly NotAnObjectMessage = "security model is not an object";
+    private static readonly MalformedSectionMessage = "section is missing or not an array";
+    private static readonly MalformedEntryMessage = "entry is not an object";
+    private static readonly NotStringMessage = "must be a string";
+    private static readonly NotStringListMessage = "must be an array of strings";
+    private static readonly NotBooleanMessage = "must be a boolean";
 
     private readonly issues: SecurityModelIssue[] = [];
 
@@ -115,14 +143,28 @@ export class SecurityModelValidator
         return section + SecurityModelValidator.IndexOpen + i + SecurityModelValidator.IndexClose;
     }
 
+    private static IsRecord(value: unknown): value is Readonly<Record<string, unknown>>
+    {
+        return typeof value === "object" && value !== null && !Array.isArray(value);
+    }
+
     private Run(): void
     {
+        if (!SecurityModelValidator.IsRecord(this.config))
+        {
+            this.Add(SecurityModelIssueCode.MalformedSection, SecurityModelValidator.RootPath, SecurityModelValidator.NotAnObjectMessage);
+            return;
+        }
         for (const key of Object.keys(this.config))
         {
-            if (!SecurityModelValidator.Sections.has(key))
+            if (!SecurityModelValidator.Shapes.has(key))
             {
                 this.Add(SecurityModelIssueCode.UnknownSection, key, SecurityModelValidator.UnknownSectionMessage);
             }
+        }
+        if (!this.CheckStructure(this.config))
+        {
+            return;
         }
         const hierarchy = this.BuildHierarchy();
         this.CheckUsers(hierarchy);
@@ -133,6 +175,66 @@ export class SecurityModelValidator
         this.CheckAssignments(SecurityModelValidator.ProfileAssignmentsPath, profiles, teamIds, SecurityModelValidator.DuplicateProfileMessage);
         this.CheckRoleOverrides();
         this.CheckProfileOverrides();
+    }
+
+    // Returns false when any section or entry has the wrong shape; the semantic checks then do not run.
+    private CheckStructure(raw: Readonly<Record<string, unknown>>): boolean
+    {
+        const before = this.issues.length;
+        for (const [section, shape] of SecurityModelValidator.Shapes)
+        {
+            const entries = raw[section];
+            if (!Array.isArray(entries))
+            {
+                this.Add(SecurityModelIssueCode.MalformedSection, section, SecurityModelValidator.MalformedSectionMessage);
+                continue;
+            }
+            entries.forEach((entry: unknown, i) =>
+            {
+                const base = SecurityModelValidator.Index(section, i);
+                if (!SecurityModelValidator.IsRecord(entry))
+                {
+                    this.Add(SecurityModelIssueCode.MalformedSection, base, SecurityModelValidator.MalformedEntryMessage);
+                    return;
+                }
+                this.CheckEntry(entry, base, shape);
+            });
+        }
+        return this.issues.length === before;
+    }
+
+    private CheckEntry(entry: Readonly<Record<string, unknown>>, base: string, shape: SectionShape): void
+    {
+        const path = (field: string) => base + SecurityModelValidator.FieldSeparator + field;
+        for (const field of shape.Strings)
+        {
+            if (typeof entry[field] !== "string")
+            {
+                this.Add(SecurityModelIssueCode.InvalidValue, path(field), SecurityModelValidator.NotStringMessage);
+            }
+        }
+        for (const field of shape.OptionalStrings)
+        {
+            if (entry[field] !== undefined && typeof entry[field] !== "string")
+            {
+                this.Add(SecurityModelIssueCode.InvalidValue, path(field), SecurityModelValidator.NotStringMessage);
+            }
+        }
+        for (const field of shape.StringLists)
+        {
+            const list = entry[field];
+            if (!Array.isArray(list) || list.some(v => typeof v !== "string"))
+            {
+                this.Add(SecurityModelIssueCode.InvalidValue, path(field), SecurityModelValidator.NotStringListMessage);
+            }
+        }
+        for (const field of shape.Booleans)
+        {
+            if (typeof entry[field] !== "boolean")
+            {
+                this.Add(SecurityModelIssueCode.InvalidValue, path(field), SecurityModelValidator.NotBooleanMessage);
+            }
+        }
     }
 
     private Add(code: SecurityModelIssueCode, path: string, message: string): void

@@ -8,6 +8,9 @@ import type { IIdpDirectorySource } from "../idp-directory-source.js";
 import { IdpDirectoryRequest } from "../idp-directory-source.js";
 import type { IIdpDirectoryStore } from "../idp-directory-store.js";
 import { IdpDirectorySync } from "../idp-directory-sync.js";
+import { TeamMembershipRows } from "../team-membership-rows.js";
+import { Principal } from "../../core/principal.js";
+import { PrincipalKind } from "../../core/identity-enums.js";
 import { FakeAuditSink, FakeIdpDirectorySource, FakeSessionManager, FakeTenant } from "../../testing/fakes.js";
 
 class MapStore implements IIdpDirectoryStore
@@ -134,4 +137,19 @@ test("a failing revocation leaves the stored snapshot untouched so the next run 
     const sync = new IdpDirectorySync(new FakeIdpDirectorySource(Fixture.Snapshot(IdpUserState.Disabled)), store, sessions, new FakeAuditSink());
     await assert.rejects(() => sync.Run(tenant, Fixture.Config()), /revoke down/);
     assert.equal(await store.Get(tenant.Id), previous);
+});
+
+test("a disabled member reached only through a linked group loses team membership and is deprovisioned", async () =>
+{
+    const tenant = FakeTenant.Saas();
+    const config = Fixture.Config();
+    assert.ok(!IdpDirectoryRequest.For(config).PrincipalIds.includes("erin"));
+    const snapshot = new IdpDirectorySnapshot(new Date(2), true, new Map([["erin", IdpUserState.Disabled]]), new Map([["hr-staff", ["erin"]]]));
+    const rows = TeamMembershipRows.For(config, snapshot);
+    assert.deepEqual(rows.Rows("hr").map(r => r.PrincipalId), ["dana"]);
+    assert.deepEqual(rows.TeamsOf(new Principal("erin", tenant.Id, PrincipalKind.User, new Map(), ["hr-staff"])), []);
+    const sessions = new RecordingSessions();
+    const result = await new IdpDirectorySync(new FakeIdpDirectorySource(snapshot), new MapStore(), sessions, new FakeAuditSink()).Run(tenant, config);
+    assert.deepEqual(result.Deprovisioned, ["erin"]);
+    assert.deepEqual(sessions.Revoked, ["erin"]);
 });

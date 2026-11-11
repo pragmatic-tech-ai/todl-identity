@@ -7,6 +7,7 @@ import { IdpUserState } from "./idp-directory-snapshot.js";
 import type { IdpDirectorySnapshot } from "./idp-directory-snapshot.js";
 import { IdpDirectoryRequest } from "./idp-directory-source.js";
 import type { IIdpDirectorySource } from "./idp-directory-source.js";
+import { UnreadableIdpDirectoryRecordError } from "./idp-directory-store.js";
 import type { IIdpDirectoryStore } from "./idp-directory-store.js";
 
 export class IdpDirectorySyncResult
@@ -40,7 +41,7 @@ export class IdpDirectorySync
     public async Run(tenant: Tenant, config: ISecurityModelConfig): Promise<IdpDirectorySyncResult>
     {
         const snapshot = await this.source.Snapshot(tenant, IdpDirectoryRequest.For(config));
-        const previous = await this.store.Get(tenant.Id);
+        const previous = await this.Previous(tenant.Id);
         const deprovisioned: string[] = [];
         for (const [principalId, state] of snapshot.Users())
         {
@@ -57,6 +58,20 @@ export class IdpDirectorySync
         ]);
         await this.audit.Record(new AuditEvent(AuditEventKind.DirectorySync, tenant.Id, null, this.now(), detail));
         return new IdpDirectorySyncResult(snapshot, deprovisioned);
+    }
+
+    /** An unreadable stored record counts as none: every gone identity is revoked again (idempotent) and the Save replaces it. */
+    private async Previous(tenantId: string): Promise<IdpDirectorySnapshot | null>
+    {
+        try
+        {
+            return await this.store.Get(tenantId);
+        }
+        catch (e)
+        {
+            if (e instanceof UnreadableIdpDirectoryRecordError) return null;
+            throw e;
+        }
     }
 
     private static IsGone(state: IdpUserState): boolean
