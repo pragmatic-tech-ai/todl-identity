@@ -8,12 +8,12 @@ export class SystemPrincipal
 
     public static IdFor(environmentId: string): string
     {
+        if (!environmentId) throw new Error(SystemPrincipal.EmptyEnvironmentMessage);
         return SystemPrincipal.Prefix + environmentId;
     }
 
     public static For(environmentId: string): Principal
     {
-        if (!environmentId) throw new Error(SystemPrincipal.EmptyEnvironmentMessage);
         return new Principal(SystemPrincipal.IdFor(environmentId), environmentId, PrincipalKind.System, new Map(), []);
     }
 
