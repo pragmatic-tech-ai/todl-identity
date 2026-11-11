@@ -1,4 +1,5 @@
 import type { IBusinessUnitConfig } from "./security-model-config.js";
+
 export class MalformedBusinessUnitTreeError extends Error
 {
     public constructor(message: string)

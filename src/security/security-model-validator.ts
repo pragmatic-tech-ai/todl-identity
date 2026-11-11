@@ -73,6 +73,8 @@ export class SecurityModelValidator
     private static readonly ActionSuffix = ".action";
     private static readonly LevelSuffix = ".level";
     private static readonly KeySeparator = "\u0000";
+    private static readonly IndexOpen = "[";
+    private static readonly IndexClose = "]";
     private static readonly DisplaySeparator = "/";
     private static readonly UnknownSectionMessage = "unknown security-model section";
     private static readonly EmptyIdMessage = "id must not be empty";
@@ -110,7 +112,7 @@ export class SecurityModelValidator
 
     private static Index(section: string, i: number): string
     {
-        return section + "[" + i + "]";
+        return section + SecurityModelValidator.IndexOpen + i + SecurityModelValidator.IndexClose;
     }
 
     private Run(): void
