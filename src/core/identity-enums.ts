@@ -9,6 +9,7 @@ export enum PrincipalKind
     User,
     Service,
     Machine,
+    System,
 }
 
 export enum Role

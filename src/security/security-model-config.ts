@@ -79,6 +79,7 @@ export enum PrivilegeAction
     AppendTo = "appendTo",
     Assign = "assign",
     Share = "share",
+    Invoke = "invoke",
 }
 
 export enum AccessLevel
