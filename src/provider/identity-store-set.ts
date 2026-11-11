@@ -5,6 +5,7 @@ import type { IServiceTokenStore } from '../authn/service-token-store.js'
 import type { ISessionManager } from '../authn/session-manager.js'
 import type { IRoleGrantStore } from '../authn/role-grant-store.js'
 import type { IAuditSink } from './audit-sink.js'
+import type { IIdpDirectoryStore } from '../directory/idp-directory-store.js'
 
 /** The persistent store set an identity pack is built over. A platform (file-backed, DB-backed, …)
  *  produces one; ServerIdentityPack.OpenWith consumes it. Accounts must satisfy both the write
@@ -17,4 +18,5 @@ export interface IdentityStoreSet
     readonly Sessions: ISessionManager
     readonly Grants: IRoleGrantStore
     readonly Audit: IAuditSink
+    readonly IdpDirectory: IIdpDirectoryStore
 }

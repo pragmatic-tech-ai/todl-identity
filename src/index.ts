@@ -59,3 +59,8 @@ export { ServiceTokenGrant, ServiceTokenSummary } from "./authn/service-token-st
 export type { IServiceTokenStore } from "./authn/service-token-store.js";
 export { IdpUserState, IdpDirectorySnapshot } from "./directory/idp-directory-snapshot.js";
 export { MembershipOrigin, TeamMembershipRow, TeamMembershipRows } from "./directory/team-membership-rows.js";
+export { IdpDirectoryRequest } from "./directory/idp-directory-source.js";
+export type { IIdpDirectorySource } from "./directory/idp-directory-source.js";
+export { IdpDirectoryStoreKey } from "./directory/idp-directory-store.js";
+export type { IIdpDirectoryStore } from "./directory/idp-directory-store.js";
+export { IdpDirectorySync, IdpDirectorySyncResult } from "./directory/idp-directory-sync.js";

@@ -4,6 +4,7 @@ export enum AuditEventKind
     AccessDecision,
     AdminAction,
     ResolutionMerge,
+    DirectorySync,
 }
 
 export class AuditEvent

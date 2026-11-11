@@ -23,6 +23,8 @@ import type { EntityPredicate, EntityView } from "../authz/entity-predicate.js";
 import { AuditEvent } from "../provider/audit-sink.js";
 import type { IAuditSink } from "../provider/audit-sink.js";
 import type { IIdentityProviderPack } from "../provider/identity-provider-pack.js";
+import type { IdpDirectoryRequest, IIdpDirectorySource } from "../directory/idp-directory-source.js";
+import type { IdpDirectorySnapshot } from "../directory/idp-directory-snapshot.js";
 import type { IIdentityProviderRegistry } from "../provider/identity-provider-registry.js";
 
 export class FakeAuthenticator implements IAuthenticator
@@ -222,5 +224,20 @@ export class FakeTenant
     public static Saas(): Tenant
     {
         return new Tenant("t1", TenantKind.Saas, "Acme");
+    }
+}
+
+export class FakeIdpDirectorySource implements IIdpDirectorySource
+{
+    public LastRequest: IdpDirectoryRequest | null = null;
+
+    public constructor(private readonly snapshot: IdpDirectorySnapshot, public readonly Authoritative: boolean = true)
+    {
+    }
+
+    public async Snapshot(_tenant: Tenant, request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>
+    {
+        this.LastRequest = request;
+        return this.snapshot;
     }
 }
