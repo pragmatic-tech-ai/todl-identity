@@ -34,6 +34,7 @@ export class SourceTokenError extends Error
     private static readonly NoUpstreamSessionMessage = "no upstream session for the principal";
     private static readonly ExchangeRejectedMessage = "the upstream token exchange was rejected";
     private static readonly PrincipalInactiveMessage = "the principal is not active";
+    private static readonly GenericMessage = "source token acquisition failed";
     private static readonly UnsupportedPrincipalMessage = "the principal cannot obtain source tokens";
 
     public constructor(public readonly Failure: SourceTokenFailure)
@@ -50,6 +51,7 @@ export class SourceTokenError extends Error
             case SourceTokenFailure.ExchangeRejected: return SourceTokenError.ExchangeRejectedMessage;
             case SourceTokenFailure.PrincipalInactive: return SourceTokenError.PrincipalInactiveMessage;
             case SourceTokenFailure.UnsupportedPrincipal: return SourceTokenError.UnsupportedPrincipalMessage;
+            default: return SourceTokenError.GenericMessage;
         }
     }
 }

@@ -2,10 +2,10 @@ import type { SourceToken, SourceTokenRequest } from "./source-token-provider.js
 
 export class PerUserSourceTokenCache
 {
-    private static readonly Separator = "\u0000";
     private static readonly DefaultSkewMs = 60_000;
 
-    private readonly entries = new Map<string, SourceToken>();
+    // tenantId -> principalId -> resource -> token
+    private readonly tenants = new Map<string, Map<string, Map<string, SourceToken>>>();
 
     public constructor(private readonly skewMs: number = PerUserSourceTokenCache.DefaultSkewMs)
     {
@@ -13,27 +13,46 @@ export class PerUserSourceTokenCache
 
     public Get(request: SourceTokenRequest, now: Date): SourceToken | undefined
     {
-        const token = this.entries.get(PerUserSourceTokenCache.KeyOf(request));
+        const resources = this.tenants.get(request.TenantId)?.get(request.PrincipalId);
+        const token = resources?.get(request.Resource);
         if (token === undefined) return undefined;
-        return token.ExpiresAt.getTime() - this.skewMs > now.getTime() ? token : undefined;
+        if (token.ExpiresAt.getTime() - this.skewMs > now.getTime()) return token;
+        this.Remove(request.TenantId, request.PrincipalId, request.Resource);
+        return undefined;
     }
 
     public Put(request: SourceTokenRequest, token: SourceToken): void
     {
-        this.entries.set(PerUserSourceTokenCache.KeyOf(request), token);
+        let principals = this.tenants.get(request.TenantId);
+        if (principals === undefined)
+        {
+            principals = new Map();
+            this.tenants.set(request.TenantId, principals);
+        }
+        let resources = principals.get(request.PrincipalId);
+        if (resources === undefined)
+        {
+            resources = new Map();
+            principals.set(request.PrincipalId, resources);
+        }
+        resources.set(request.Resource, token);
     }
 
     public Forget(tenantId: string, principalId: string): void
     {
-        const prefix = tenantId + PerUserSourceTokenCache.Separator + principalId + PerUserSourceTokenCache.Separator;
-        for (const key of [...this.entries.keys()])
-        {
-            if (key.startsWith(prefix)) this.entries.delete(key);
-        }
+        const principals = this.tenants.get(tenantId);
+        if (principals === undefined) return;
+        principals.delete(principalId);
+        if (principals.size === 0) this.tenants.delete(tenantId);
     }
 
-    private static KeyOf(request: SourceTokenRequest): string
+    private Remove(tenantId: string, principalId: string, resource: string): void
     {
-        return [request.TenantId, request.PrincipalId, request.Resource].join(PerUserSourceTokenCache.Separator);
+        const principals = this.tenants.get(tenantId);
+        const resources = principals?.get(principalId);
+        if (principals === undefined || resources === undefined) return;
+        resources.delete(resource);
+        if (resources.size === 0) principals.delete(principalId);
+        if (principals.size === 0) this.tenants.delete(tenantId);
     }
 }

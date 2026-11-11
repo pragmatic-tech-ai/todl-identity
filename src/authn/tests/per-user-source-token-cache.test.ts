@@ -5,13 +5,14 @@ import { PresentedSecret } from "../presented-secret.js";
 import { SourceToken, SourceTokenError, SourceTokenFailure, SourceTokenRequest } from "../source-token-provider.js";
 
 const Resource = "https://database.windows.net/.default";
-const Now = new Date("2026-01-01T00:00:00Z");
 
 class Tokens
 {
+    public static readonly Now = new Date("2026-01-01T00:00:00Z");
+
     public static Make(secret: string, ttlMs: number): SourceToken
     {
-        return new SourceToken(Resource, new PresentedSecret(secret), new Date(Now.getTime() + ttlMs));
+        return new SourceToken(Resource, new PresentedSecret(secret), new Date(Tokens.Now.getTime() + ttlMs));
     }
 }
 
@@ -20,9 +21,9 @@ test("cache never serves one principal's token to another", () =>
     const cache = new PerUserSourceTokenCache();
     const token = Tokens.Make("alice-secret", 3_600_000);
     cache.Put(new SourceTokenRequest("t", "alice", Resource), token);
-    assert.equal(cache.Get(new SourceTokenRequest("t", "bob", Resource), Now), undefined);
-    assert.equal(cache.Get(new SourceTokenRequest("t2", "alice", Resource), Now), undefined);
-    assert.equal(cache.Get(new SourceTokenRequest("t", "alice", Resource), Now), token);
+    assert.equal(cache.Get(new SourceTokenRequest("t", "bob", Resource), Tokens.Now), undefined);
+    assert.equal(cache.Get(new SourceTokenRequest("t2", "alice", Resource), Tokens.Now), undefined);
+    assert.equal(cache.Get(new SourceTokenRequest("t", "alice", Resource), Tokens.Now), token);
 });
 
 test("a token inside the skew window is a miss", () =>
@@ -30,7 +31,7 @@ test("a token inside the skew window is a miss", () =>
     const cache = new PerUserSourceTokenCache();
     const request = new SourceTokenRequest("t", "alice", Resource);
     cache.Put(request, Tokens.Make("s", 30_000));
-    assert.equal(cache.Get(request, Now), undefined);
+    assert.equal(cache.Get(request, Tokens.Now), undefined);
 });
 
 test("Forget drops every resource of that principal only", () =>
@@ -43,9 +44,9 @@ test("Forget drops every resource of that principal only", () =>
     cache.Put(a2, Tokens.Make("s", 3_600_000));
     cache.Put(b1, Tokens.Make("s", 3_600_000));
     cache.Forget("t", "alice");
-    assert.equal(cache.Get(a1, Now), undefined);
-    assert.equal(cache.Get(a2, Now), undefined);
-    assert.notEqual(cache.Get(b1, Now), undefined);
+    assert.equal(cache.Get(a1, Tokens.Now), undefined);
+    assert.equal(cache.Get(a2, Tokens.Now), undefined);
+    assert.notEqual(cache.Get(b1, Tokens.Now), undefined);
 });
 
 test("SourceTokenError carries its failure and no secret", () =>
