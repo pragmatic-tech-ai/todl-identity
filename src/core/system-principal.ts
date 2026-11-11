@@ -17,8 +17,13 @@ export class SystemPrincipal
         return new Principal(SystemPrincipal.IdFor(environmentId), environmentId, PrincipalKind.System, new Map(), []);
     }
 
+    public static IsId(principalId: string): boolean
+    {
+        return principalId.startsWith(SystemPrincipal.Prefix);
+    }
+
     public static Is(principal: Principal): boolean
     {
-        return principal.Kind === PrincipalKind.System && principal.Id.startsWith(SystemPrincipal.Prefix);
+        return principal.Kind === PrincipalKind.System && SystemPrincipal.IsId(principal.Id);
     }
 }
