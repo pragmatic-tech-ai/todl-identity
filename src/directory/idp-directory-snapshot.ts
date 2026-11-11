@@ -23,7 +23,9 @@ export class IdpDirectorySnapshot
     )
     {
         this.users = new Map(users);
-        this.groups = new Map(groups);
+        const copy = new Map<string, readonly string[]>();
+        for (const [k, v] of groups) copy.set(k, [...v]);
+        this.groups = copy;
     }
 
     public static NonAuthoritative(at: Date): IdpDirectorySnapshot
@@ -44,7 +46,13 @@ export class IdpDirectorySnapshot
     public IsActive(principal: Principal): boolean
     {
         if (principal.Kind !== PrincipalKind.User) return true;
-        const state = this.StateOf(principal.Id);
+        return this.IsStateActive(principal.Id);
+    }
+
+    /** True unless the IdP records the user as Disabled or Deleted (unknown counts as active). */
+    public IsStateActive(principalId: string): boolean
+    {
+        const state = this.StateOf(principalId);
         return state !== IdpUserState.Disabled && state !== IdpUserState.Deleted;
     }
 
