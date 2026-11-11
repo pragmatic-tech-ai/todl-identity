@@ -27,31 +27,19 @@ export type { IRoleGrantStore } from "./authn/role-grant-store.js";
 export { AuditEvent, AuditEventKind } from "./provider/audit-sink.js";
 export type { IAuditSink } from "./provider/audit-sink.js";
 export { IdentityConfig } from "./provider/identity-config.js";
-export { OwnershipSourceKind, PrivilegeAction, AccessLevel } from "./security/security-model-config.js";
+export { PrivilegeAction, AccessLevel } from "./security/security-model-config.js";
 export type {
     IBusinessUnitConfig,
+    IUserPlacementConfig,
     ITeamConfig,
-    IMembershipClaimRule,
-    IMembershipOverride,
-    IMembershipConfig,
-    IOwnershipSource,
-    IOwnershipRuleConfig,
-    ISecurityModelConfig,
-    IPrivilegeConfig,
-    IRoleConfig,
-    IRoleClaimRule,
-    IRoleOverride,
-    ITeamRoleGrant,
     IRoleAssignmentConfig,
-    ISecuredFieldConfig,
-    IFieldGrantConfig,
-    IFieldProfileConfig,
-    IFieldProfileClaimRule,
-    IFieldProfileOverride,
-    IFieldProfileTeamGrant,
-    IFieldProfileAssignmentConfig,
-    IFieldSecurityConfig,
+    IProfileAssignmentConfig,
+    IRoleOverrideConfig,
+    IProfileOverrideConfig,
+    ISecurityModelConfig,
 } from "./security/security-model-config.js";
+export { BusinessUnitHierarchy, MalformedBusinessUnitTreeError } from "./security/business-unit-hierarchy.js";
+export { SecurityModelIssueCode, SecurityModelIssue, InvalidSecurityModelError, SecurityModelValidator } from "./security/security-model-validator.js";
 export { TenantConfigStoreKey } from "./provider/tenant-config-store.js";
 export type { ITenantConfigStore } from "./provider/tenant-config-store.js";
 export type { ITenantResolver } from "./provider/tenant-resolver.js";
