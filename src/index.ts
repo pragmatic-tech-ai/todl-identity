@@ -64,3 +64,8 @@ export type { IIdpDirectorySource } from "./directory/idp-directory-source.js";
 export { IdpDirectoryStoreKey } from "./directory/idp-directory-store.js";
 export type { IIdpDirectoryStore } from "./directory/idp-directory-store.js";
 export { IdpDirectorySync, IdpDirectorySyncResult } from "./directory/idp-directory-sync.js";
+export { LocalGroup, LocalGroupNotFoundError } from "./authn/local-group-store.js";
+export type { ILocalGroupStore } from "./authn/local-group-store.js";
+export { SourceTokenRequest, SourceToken, SourceTokenFailure, SourceTokenError, SourceTokenProviderKey } from "./authn/source-token-provider.js";
+export type { ISourceTokenProvider } from "./authn/source-token-provider.js";
+export { PerUserSourceTokenCache } from "./authn/per-user-source-token-cache.js";

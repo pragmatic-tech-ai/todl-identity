@@ -1,5 +1,6 @@
 import type { ISecretStore } from '../authn/secret-store.js'
 import type { ILocalAccountStore } from '../authn/local-account-store.js'
+import type { ILocalGroupStore } from '../authn/local-group-store.js'
 import type { IPrincipalDirectory } from '../authn/principal-directory.js'
 import type { IServiceTokenStore } from '../authn/service-token-store.js'
 import type { ISessionManager } from '../authn/session-manager.js'
@@ -13,7 +14,7 @@ import type { IIdpDirectoryStore } from '../directory/idp-directory-store.js'
 export interface IdentityStoreSet
 {
     readonly Secrets: ISecretStore
-    readonly Accounts: ILocalAccountStore & IPrincipalDirectory
+    readonly Accounts: ILocalAccountStore & IPrincipalDirectory & ILocalGroupStore
     readonly Tokens: IServiceTokenStore
     readonly Sessions: ISessionManager
     readonly Grants: IRoleGrantStore
