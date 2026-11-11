@@ -57,3 +57,5 @@ export { LocalAccount, LocalAccountNotFoundError } from "./authn/local-account-s
 export type { ILocalAccountStore } from "./authn/local-account-store.js";
 export { ServiceTokenGrant, ServiceTokenSummary } from "./authn/service-token-store.js";
 export type { IServiceTokenStore } from "./authn/service-token-store.js";
+export { IdpUserState, IdpDirectorySnapshot } from "./directory/idp-directory-snapshot.js";
+export { MembershipOrigin, TeamMembershipRow, TeamMembershipRows } from "./directory/team-membership-rows.js";
