@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 todl-identity — `@pragmatic-tech-ai/todl-identity`, the engine-layer identity
-management contracts: principal/tenant/session value types and the swappable
+management contracts: principal/realm/session value types and the swappable
 provider-pack seams. ESM, strict tsconfig; tests via
 `tsx --conditions=development --test "src/**/*.test.ts"`.
 

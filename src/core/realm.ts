@@ -1,10 +1,10 @@
-import { TenantKind } from "./identity-enums.js";
+import { RealmKind } from "./identity-enums.js";
 
-export class Tenant
+export class Realm
 {
     public constructor(
         public readonly Id: string,
-        public readonly Kind: TenantKind,
+        public readonly Kind: RealmKind,
         public readonly DisplayName: string,
     )
     {
@@ -12,6 +12,6 @@ export class Tenant
 
     public IsSelfHosted(): boolean
     {
-        return this.Kind === TenantKind.SelfHosted;
+        return this.Kind === RealmKind.SelfHosted;
     }
 }

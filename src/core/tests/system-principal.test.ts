@@ -8,7 +8,7 @@ test("system principal is per environment, System kind, no groups", () =>
 {
     const p = SystemPrincipal.For("env-1");
     assert.equal(p.Id, "system:env-1");
-    assert.equal(p.TenantId, "env-1");
+    assert.equal(p.RealmId, "env-1");
     assert.equal(p.Kind, PrincipalKind.System);
     assert.deepEqual(p.Groups, []);
     assert.equal(SystemPrincipal.Is(p), true);

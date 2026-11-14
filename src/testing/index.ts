@@ -7,7 +7,7 @@ export {
     FakeAuditSink,
     FakeIdentityProviderPack,
     FakeIdentityProviderRegistry,
-    FakeTenant,
+    FakeRealm,
     FakeIdpDirectorySource,
 } from "./fakes.js";
 export { IdentityPackConformance } from "./provider-pack-conformance.js";

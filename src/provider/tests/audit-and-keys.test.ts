@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { ServiceKey } from "@pragmatic-tech-ai/todl-runtime";
 import { AuditEvent, AuditEventKind } from "../audit-sink.js";
 import { IdentityProviderRegistryKey } from "../identity-provider-registry.js";
-import { TenantConfigStoreKey } from "../tenant-config-store.js";
+import { RealmConfigStoreKey } from "../realm-config-store.js";
 
 test("audit event carries structured, secret-free detail", () =>
 {
@@ -22,5 +22,5 @@ test("audit event carries structured, secret-free detail", () =>
 test("service keys are defined for DI resolution", () =>
 {
     assert.ok(IdentityProviderRegistryKey instanceof ServiceKey);
-    assert.ok(TenantConfigStoreKey instanceof ServiceKey);
+    assert.ok(RealmConfigStoreKey instanceof ServiceKey);
 });

@@ -1,10 +1,10 @@
 import { ServiceKey } from "@pragmatic-tech-ai/todl-runtime";
-import type { Tenant } from "../core/tenant.js";
+import type { Realm } from "../core/realm.js";
 import type { IIdentityProviderPack } from "./identity-provider-pack.js";
 
 export interface IIdentityProviderRegistry
 {
-    PackFor(tenant: Tenant): Promise<IIdentityProviderPack>;
+    PackFor(realm: Realm): Promise<IIdentityProviderPack>;
 }
 
 export const IdentityProviderRegistryKey =

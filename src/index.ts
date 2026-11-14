@@ -1,6 +1,6 @@
 // @pragmatic-tech-ai/todl-identity — identity management contracts.
-export { TenantKind, PrincipalKind, Role, Action, ResourceKind, AuthMethod, DelegationDepth } from "./core/identity-enums.js";
-export { Tenant } from "./core/tenant.js";
+export { RealmKind, PrincipalKind, Role, Action, ResourceKind, AuthMethod, DelegationDepth } from "./core/identity-enums.js";
+export { Realm } from "./core/realm.js";
 export { Principal } from "./core/principal.js";
 export { SystemPrincipal } from "./core/system-principal.js";
 export { BaseRole } from "./security/base-role.js";
@@ -40,9 +40,9 @@ export type {
 } from "./security/security-model-config.js";
 export { BusinessUnitHierarchy, MalformedBusinessUnitTreeError } from "./security/business-unit-hierarchy.js";
 export { SecurityModelIssueCode, SecurityModelIssue, InvalidSecurityModelError, SecurityModelValidator } from "./security/security-model-validator.js";
-export { TenantConfigStoreKey } from "./provider/tenant-config-store.js";
-export type { ITenantConfigStore } from "./provider/tenant-config-store.js";
-export type { ITenantResolver } from "./provider/tenant-resolver.js";
+export { RealmConfigStoreKey } from "./provider/realm-config-store.js";
+export type { IRealmConfigStore } from "./provider/realm-config-store.js";
+export type { IRealmResolver } from "./provider/realm-resolver.js";
 export type { IIdentityProviderPack } from "./provider/identity-provider-pack.js";
 export type { IdentityStoreSet } from "./provider/identity-store-set.js";
 export { IdentityProviderRegistryKey } from "./provider/identity-provider-registry.js";

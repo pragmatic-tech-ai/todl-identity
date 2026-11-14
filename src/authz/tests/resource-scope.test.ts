@@ -6,19 +6,19 @@ import { ResourceScope } from "../resource-scope.js";
 
 class ResourceScopeFixture
 {
-    public static Ref(tenant: string, path: readonly string[], kind: ResourceKind = ResourceKind.Model): ResourceRef
+    public static Ref(realm: string, path: readonly string[], kind: ResourceKind = ResourceKind.Model): ResourceRef
     {
-        return new ResourceRef(kind, tenant, path);
+        return new ResourceRef(kind, realm, path);
     }
 }
 
-test("ancestor grant covers descendant in same tenant; sibling and cross-tenant do not", () =>
+test("ancestor grant covers descendant in same realm; sibling and cross-realm do not", () =>
 {
     const project = ResourceScopeFixture.Ref("t1", ["p1"], ResourceKind.Project);
     const model = ResourceScopeFixture.Ref("t1", ["p1", "m1"]);
-    const tenant = ResourceScopeFixture.Ref("t1", [], ResourceKind.Tenant);
+    const realm = ResourceScopeFixture.Ref("t1", [], ResourceKind.Realm);
     assert.equal(ResourceScope.Covers(project, model), true);
-    assert.equal(ResourceScope.Covers(tenant, model), true);
+    assert.equal(ResourceScope.Covers(realm, model), true);
     assert.equal(ResourceScope.Covers(model, model), true);
     assert.equal(ResourceScope.Covers(model, project), false);
     assert.equal(ResourceScope.Covers(ResourceScopeFixture.Ref("t1", ["p2"], ResourceKind.Project), model), false);

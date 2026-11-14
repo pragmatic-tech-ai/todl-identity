@@ -4,19 +4,19 @@ import type { IdpDirectorySnapshot } from "./idp-directory-snapshot.js";
 export interface IIdpDirectoryStore
 {
     /** Throws UnreadableIdpDirectoryRecordError when the stored record cannot be trusted (fail-closed); Save replaces it. */
-    Get(tenantId: string): Promise<IdpDirectorySnapshot | null>;
-    Save(tenantId: string, snapshot: IdpDirectorySnapshot): Promise<void>;
+    Get(realmId: string): Promise<IdpDirectorySnapshot | null>;
+    Save(realmId: string, snapshot: IdpDirectorySnapshot): Promise<void>;
 }
 
-/** A stored directory snapshot for one tenant is malformed; readers must not treat the tenant's users as active. */
+/** A stored directory snapshot for one realm is malformed; readers must not treat the realm's users as active. */
 export class UnreadableIdpDirectoryRecordError extends Error
 {
-    private static readonly MessagePrefix = "stored IdP directory record is unreadable for tenant ";
+    private static readonly MessagePrefix = "stored IdP directory record is unreadable for realm ";
     private static readonly ReasonSeparator = ": ";
 
-    public constructor(public readonly TenantId: string, public readonly Reason: string)
+    public constructor(public readonly RealmId: string, public readonly Reason: string)
     {
-        super(UnreadableIdpDirectoryRecordError.MessagePrefix + TenantId + UnreadableIdpDirectoryRecordError.ReasonSeparator + Reason);
+        super(UnreadableIdpDirectoryRecordError.MessagePrefix + RealmId + UnreadableIdpDirectoryRecordError.ReasonSeparator + Reason);
         this.name = new.target.name;
     }
 }

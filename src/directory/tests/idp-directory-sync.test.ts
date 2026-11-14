@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { ISecurityModelConfig } from "../../security/security-model-config.js";
-import { Tenant } from "../../core/tenant.js";
+import { Realm } from "../../core/realm.js";
 import { AuditEventKind } from "../../provider/audit-sink.js";
 import { IdpDirectorySnapshot, IdpUserState } from "../idp-directory-snapshot.js";
 import type { IIdpDirectorySource } from "../idp-directory-source.js";
@@ -11,20 +11,20 @@ import { IdpDirectorySync } from "../idp-directory-sync.js";
 import { TeamMembershipRows } from "../team-membership-rows.js";
 import { Principal } from "../../core/principal.js";
 import { PrincipalKind } from "../../core/identity-enums.js";
-import { FakeAuditSink, FakeIdpDirectorySource, FakeSessionManager, FakeTenant } from "../../testing/fakes.js";
+import { FakeAuditSink, FakeIdpDirectorySource, FakeSessionManager, FakeRealm } from "../../testing/fakes.js";
 
 class MapStore implements IIdpDirectoryStore
 {
     private readonly map = new Map<string, IdpDirectorySnapshot>();
 
-    public async Get(tenantId: string): Promise<IdpDirectorySnapshot | null>
+    public async Get(realmId: string): Promise<IdpDirectorySnapshot | null>
     {
-        return this.map.get(tenantId) ?? null;
+        return this.map.get(realmId) ?? null;
     }
 
-    public async Save(tenantId: string, snapshot: IdpDirectorySnapshot): Promise<void>
+    public async Save(realmId: string, snapshot: IdpDirectorySnapshot): Promise<void>
     {
-        this.map.set(tenantId, snapshot);
+        this.map.set(realmId, snapshot);
     }
 }
 
@@ -43,11 +43,11 @@ class RecordingSessions extends FakeSessionManager
     public readonly Revoked: string[] = [];
     public FailRevoke = false;
 
-    public override async RevokeAllFor(tenant: Tenant, principalId: string): Promise<void>
+    public override async RevokeAllFor(realm: Realm, principalId: string): Promise<void>
     {
         if (this.FailRevoke) throw new Error("revoke down");
         this.Revoked.push(principalId);
-        await super.RevokeAllFor(tenant, principalId);
+        await super.RevokeAllFor(realm, principalId);
     }
 }
 
@@ -84,14 +84,14 @@ test("request covers linked groups and every referenced principal", () =>
 
 test("sync saves the snapshot and audits one DirectorySync event", async () =>
 {
-    const tenant = FakeTenant.Saas();
+    const realm = FakeRealm.Saas();
     const snapshot = Fixture.Snapshot(IdpUserState.Enabled);
     const source = new FakeIdpDirectorySource(snapshot);
     const store = new MapStore();
     const audit = new FakeAuditSink();
     const sync = new IdpDirectorySync(source, store, new FakeSessionManager(), audit, () => new Date(5));
-    await sync.Run(tenant, Fixture.Config());
-    assert.equal(await store.Get(tenant.Id), snapshot);
+    await sync.Run(realm, Fixture.Config());
+    assert.equal(await store.Get(realm.Id), snapshot);
     assert.equal(audit.Events.length, 1);
     const event = audit.Events[0];
     assert.equal(event.Kind, AuditEventKind.DirectorySync);
@@ -101,55 +101,55 @@ test("sync saves the snapshot and audits one DirectorySync event", async () =>
 
 test("sync revokes sessions of newly deprovisioned identities", async () =>
 {
-    const tenant = FakeTenant.Saas();
+    const realm = FakeRealm.Saas();
     const store = new MapStore();
-    await store.Save(tenant.Id, Fixture.Snapshot(IdpUserState.Enabled));
+    await store.Save(realm.Id, Fixture.Snapshot(IdpUserState.Enabled));
     const sessions = new RecordingSessions();
     const source = new FakeIdpDirectorySource(Fixture.Snapshot(IdpUserState.Disabled));
     const sync = new IdpDirectorySync(source, store, sessions, new FakeAuditSink());
-    const first = await sync.Run(tenant, Fixture.Config());
+    const first = await sync.Run(realm, Fixture.Config());
     assert.deepEqual(first.Deprovisioned, ["dana"]);
     assert.deepEqual(sessions.Revoked, ["dana"]);
-    const second = await sync.Run(tenant, Fixture.Config());
+    const second = await sync.Run(realm, Fixture.Config());
     assert.deepEqual(second.Deprovisioned, []);
     assert.deepEqual(sessions.Revoked, ["dana"]);
 });
 
 test("a failing source leaves the stored snapshot untouched and rethrows", async () =>
 {
-    const tenant = FakeTenant.Saas();
+    const realm = FakeRealm.Saas();
     const store = new MapStore();
     const previous = Fixture.Snapshot(IdpUserState.Enabled);
-    await store.Save(tenant.Id, previous);
+    await store.Save(realm.Id, previous);
     const sync = new IdpDirectorySync(new ThrowingSource(), store, new FakeSessionManager(), new FakeAuditSink());
-    await assert.rejects(() => sync.Run(tenant, Fixture.Config()), /idp down/);
-    assert.equal(await store.Get(tenant.Id), previous);
+    await assert.rejects(() => sync.Run(realm, Fixture.Config()), /idp down/);
+    assert.equal(await store.Get(realm.Id), previous);
 });
 
 test("a failing revocation leaves the stored snapshot untouched so the next run retries", async () =>
 {
-    const tenant = FakeTenant.Saas();
+    const realm = FakeRealm.Saas();
     const store = new MapStore();
     const previous = Fixture.Snapshot(IdpUserState.Enabled);
-    await store.Save(tenant.Id, previous);
+    await store.Save(realm.Id, previous);
     const sessions = new RecordingSessions();
     sessions.FailRevoke = true;
     const sync = new IdpDirectorySync(new FakeIdpDirectorySource(Fixture.Snapshot(IdpUserState.Disabled)), store, sessions, new FakeAuditSink());
-    await assert.rejects(() => sync.Run(tenant, Fixture.Config()), /revoke down/);
-    assert.equal(await store.Get(tenant.Id), previous);
+    await assert.rejects(() => sync.Run(realm, Fixture.Config()), /revoke down/);
+    assert.equal(await store.Get(realm.Id), previous);
 });
 
 test("a disabled member reached only through a linked group loses team membership and is deprovisioned", async () =>
 {
-    const tenant = FakeTenant.Saas();
+    const realm = FakeRealm.Saas();
     const config = Fixture.Config();
     assert.ok(!IdpDirectoryRequest.For(config).PrincipalIds.includes("erin"));
     const snapshot = new IdpDirectorySnapshot(new Date(2), true, new Map([["erin", IdpUserState.Disabled]]), new Map([["hr-staff", ["erin"]]]));
     const rows = TeamMembershipRows.For(config, snapshot);
     assert.deepEqual(rows.Rows("hr").map(r => r.PrincipalId), ["dana"]);
-    assert.deepEqual(rows.TeamsOf(new Principal("erin", tenant.Id, PrincipalKind.User, new Map(), ["hr-staff"])), []);
+    assert.deepEqual(rows.TeamsOf(new Principal("erin", realm.Id, PrincipalKind.User, new Map(), ["hr-staff"])), []);
     const sessions = new RecordingSessions();
-    const result = await new IdpDirectorySync(new FakeIdpDirectorySource(snapshot), new MapStore(), sessions, new FakeAuditSink()).Run(tenant, config);
+    const result = await new IdpDirectorySync(new FakeIdpDirectorySource(snapshot), new MapStore(), sessions, new FakeAuditSink()).Run(realm, config);
     assert.deepEqual(result.Deprovisioned, ["erin"]);
     assert.deepEqual(sessions.Revoked, ["erin"]);
 });

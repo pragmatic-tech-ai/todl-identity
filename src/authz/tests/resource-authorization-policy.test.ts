@@ -1,21 +1,21 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Role, Action, ResourceKind, PrincipalKind, TenantKind } from "../../core/identity-enums.js";
+import { Role, Action, ResourceKind, PrincipalKind, RealmKind } from "../../core/identity-enums.js";
 import { Principal } from "../../core/principal.js";
-import { Tenant } from "../../core/tenant.js";
+import { Realm } from "../../core/realm.js";
 import { ResourceRef } from "../../core/resource-ref.js";
 import { Grant } from "../../core/grant.js";
 import { AccessContext } from "../access-context.js";
 import { ResourceAuthorizationPolicy } from "../resource-authorization-policy.js";
 
 const policy = new ResourceAuthorizationPolicy();
-const tenant = new Tenant("t1", TenantKind.Saas, "Acme");
+const realm = new Realm("t1", RealmKind.Saas, "Acme");
 const principal = new Principal("u1", "t1", PrincipalKind.User, new Map(), []);
 const model = new ResourceRef(ResourceKind.Model, "t1", ["p1", "m1"]);
 
 function context(grants: readonly Grant[]): AccessContext
 {
-    return new AccessContext(principal, tenant, grants, policy);
+    return new AccessContext(principal, realm, grants, policy);
 }
 
 test("deny-by-default with no grants", () =>

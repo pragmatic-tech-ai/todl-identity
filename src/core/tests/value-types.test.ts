@@ -1,14 +1,19 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { TenantKind, PrincipalKind, Role, Action, AuthMethod } from "../identity-enums.js";
-import { Tenant } from "../tenant.js";
+import { RealmKind, PrincipalKind, Role, Action, AuthMethod, ResourceKind } from "../identity-enums.js";
+import { Realm } from "../realm.js";
 import { Principal } from "../principal.js";
 import { Session } from "../session.js";
 
-test("Tenant.IsSelfHosted reflects kind", () =>
+test("Realm.IsSelfHosted reflects kind", () =>
 {
-    assert.equal(new Tenant("t1", TenantKind.SelfHosted, "Local").IsSelfHosted(), true);
-    assert.equal(new Tenant("t2", TenantKind.Saas, "Acme").IsSelfHosted(), false);
+    assert.equal(new Realm("t1", RealmKind.SelfHosted, "Local").IsSelfHosted(), true);
+    assert.equal(new Realm("t2", RealmKind.Saas, "Acme").IsSelfHosted(), false);
+});
+
+test("ResourceKind.Realm keeps the stored value 0 (it was ResourceKind.Tenant)", () =>
+{
+    assert.equal(ResourceKind.Realm, 0);
 });
 
 test("Principal group and claim lookup", () =>

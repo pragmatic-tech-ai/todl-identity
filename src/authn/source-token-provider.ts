@@ -4,7 +4,7 @@ import type { PresentedSecret } from "./presented-secret.js";
 export class SourceTokenRequest
 {
     public constructor(
-        public readonly TenantId: string,
+        public readonly RealmId: string,
         public readonly PrincipalId: string,
         public readonly Resource: string)
     {

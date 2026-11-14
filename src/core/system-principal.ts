@@ -31,6 +31,6 @@ export class SystemPrincipal
 
     public static Is(principal: Principal): boolean
     {
-        return principal.Kind === PrincipalKind.System && SystemPrincipal.IsId(principal.Id, principal.TenantId);
+        return principal.Kind === PrincipalKind.System && SystemPrincipal.IsId(principal.Id, principal.RealmId);
     }
 }

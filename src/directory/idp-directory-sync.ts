@@ -1,4 +1,4 @@
-import type { Tenant } from "../core/tenant.js";
+import type { Realm } from "../core/realm.js";
 import type { ISessionManager } from "../authn/session-manager.js";
 import { AuditEvent, AuditEventKind } from "../provider/audit-sink.js";
 import type { IAuditSink } from "../provider/audit-sink.js";
@@ -38,10 +38,10 @@ export class IdpDirectorySync
     {
     }
 
-    public async Run(tenant: Tenant, config: ISecurityModelConfig): Promise<IdpDirectorySyncResult>
+    public async Run(realm: Realm, config: ISecurityModelConfig): Promise<IdpDirectorySyncResult>
     {
-        const snapshot = await this.source.Snapshot(tenant, IdpDirectoryRequest.For(config));
-        const previous = await this.Previous(tenant.Id);
+        const snapshot = await this.source.Snapshot(realm, IdpDirectoryRequest.For(config));
+        const previous = await this.Previous(realm.Id);
         const deprovisioned: string[] = [];
         for (const [principalId, state] of snapshot.Users())
         {
@@ -49,23 +49,23 @@ export class IdpDirectorySync
             const before = previous?.StateOf(principalId) ?? IdpUserState.Unknown;
             if (!IdpDirectorySync.IsGone(before)) deprovisioned.push(principalId);
         }
-        for (const principalId of deprovisioned) await this.sessions.RevokeAllFor(tenant, principalId);
-        await this.store.Save(tenant.Id, snapshot);
+        for (const principalId of deprovisioned) await this.sessions.RevokeAllFor(realm, principalId);
+        await this.store.Save(realm.Id, snapshot);
         const detail = new Map<string, string>([
             [IdpDirectorySync.UsersKey, String(snapshot.Users().size)],
             [IdpDirectorySync.GroupsKey, String(snapshot.Groups().size)],
             [IdpDirectorySync.DeprovisionedKey, String(deprovisioned.length)],
         ]);
-        await this.audit.Record(new AuditEvent(AuditEventKind.DirectorySync, tenant.Id, null, this.now(), detail));
+        await this.audit.Record(new AuditEvent(AuditEventKind.DirectorySync, realm.Id, null, this.now(), detail));
         return new IdpDirectorySyncResult(snapshot, deprovisioned);
     }
 
     /** An unreadable stored record counts as none: every gone identity is revoked again (idempotent) and the Save replaces it. */
-    private async Previous(tenantId: string): Promise<IdpDirectorySnapshot | null>
+    private async Previous(realmId: string): Promise<IdpDirectorySnapshot | null>
     {
         try
         {
-            return await this.store.Get(tenantId);
+            return await this.store.Get(realmId);
         }
         catch (e)
         {

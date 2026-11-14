@@ -1,4 +1,4 @@
-export enum TenantKind
+export enum RealmKind
 {
     Saas,
     SelfHosted,
@@ -33,7 +33,7 @@ export enum Action
 
 export enum ResourceKind
 {
-    Tenant,
+    Realm,
     Project,
     Model,
     Connector,

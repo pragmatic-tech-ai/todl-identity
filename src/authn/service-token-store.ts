@@ -1,4 +1,4 @@
-import type { Tenant } from "../core/tenant.js";
+import type { Realm } from "../core/realm.js";
 import type { PresentedSecret } from "./presented-secret.js";
 
 export class ServiceTokenGrant
@@ -6,7 +6,7 @@ export class ServiceTokenGrant
     public constructor(
         public readonly TokenRef: string,
         public readonly PrincipalId: string,
-        public readonly TenantId: string,
+        public readonly RealmId: string,
         public readonly Scopes: readonly string[],
         public readonly ExpiresAt: Date | null)
     {
@@ -27,8 +27,8 @@ export class ServiceTokenSummary
 
 export interface IServiceTokenStore
 {
-    Issue(tenant: Tenant, principalId: string, scopes: readonly string[], expiresAt: Date | null): Promise<{ Grant: ServiceTokenGrant; Token: string }>;
-    Resolve(tenant: Tenant, presented: PresentedSecret): Promise<ServiceTokenGrant | null>;
-    Revoke(tenant: Tenant, tokenRef: string): Promise<void>;
-    List(tenant: Tenant): Promise<readonly ServiceTokenSummary[]>;
+    Issue(realm: Realm, principalId: string, scopes: readonly string[], expiresAt: Date | null): Promise<{ Grant: ServiceTokenGrant; Token: string }>;
+    Resolve(realm: Realm, presented: PresentedSecret): Promise<ServiceTokenGrant | null>;
+    Revoke(realm: Realm, tokenRef: string): Promise<void>;
+    List(realm: Realm): Promise<readonly ServiceTokenSummary[]>;
 }

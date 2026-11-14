@@ -4,7 +4,7 @@ export class Principal
 {
     public constructor(
         public readonly Id: string,
-        public readonly TenantId: string,
+        public readonly RealmId: string,
         public readonly Kind: PrincipalKind,
         public readonly Claims: ReadonlyMap<string, string>,
         public readonly Groups: readonly string[],

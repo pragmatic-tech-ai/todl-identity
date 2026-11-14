@@ -1,4 +1,4 @@
-import type { Tenant } from "../core/tenant.js";
+import type { Realm } from "../core/realm.js";
 import { IdpDirectorySnapshot } from "./idp-directory-snapshot.js";
 import type { IdpDirectoryRequest, IIdpDirectorySource } from "./idp-directory-source.js";
 
@@ -11,7 +11,7 @@ export class NonAuthoritativeDirectorySource implements IIdpDirectorySource
     {
     }
 
-    public async Snapshot(_tenant: Tenant, _request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>
+    public async Snapshot(_realm: Realm, _request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>
     {
         return IdpDirectorySnapshot.NonAuthoritative(this.now());
     }

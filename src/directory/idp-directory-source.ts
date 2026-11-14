@@ -1,4 +1,4 @@
-import type { Tenant } from "../core/tenant.js";
+import type { Realm } from "../core/realm.js";
 import type { ISecurityModelConfig } from "../security/security-model-config.js";
 import type { IdpDirectorySnapshot } from "./idp-directory-snapshot.js";
 
@@ -37,5 +37,5 @@ export class IdpDirectoryRequest
 export interface IIdpDirectorySource
 {
     readonly Authoritative: boolean;
-    Snapshot(tenant: Tenant, request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>;
+    Snapshot(realm: Realm, request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>;
 }

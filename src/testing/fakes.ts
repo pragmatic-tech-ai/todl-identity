@@ -1,7 +1,7 @@
-import { AuthMethod, DelegationDepth, PrincipalKind, TenantKind } from "../core/identity-enums.js";
+import { AuthMethod, DelegationDepth, PrincipalKind, RealmKind } from "../core/identity-enums.js";
 import { Principal } from "../core/principal.js";
 import { Session } from "../core/session.js";
-import { Tenant } from "../core/tenant.js";
+import { Realm } from "../core/realm.js";
 import type { Grant } from "../core/grant.js";
 import { Credential } from "../authn/credential.js";
 import {
@@ -36,7 +36,7 @@ export class FakeAuthenticator implements IAuthenticator
     {
     }
 
-    public async Authenticate(_credential: Credential, presented: PresentedSecret, _tenant: Tenant): Promise<AuthenticationResult>
+    public async Authenticate(_credential: Credential, presented: PresentedSecret, _realm: Realm): Promise<AuthenticationResult>
     {
         if (presented.Reveal() === FakeAuthenticator.AcceptanceToken)
         {
@@ -59,7 +59,7 @@ export class FakeSessionManager implements ISessionManager
         const session = new Session(
             id,
             principal.Id,
-            principal.TenantId,
+            principal.RealmId,
             new Date(0),
             new Date(8640000000000000),
             AuthMethod.Local,
@@ -78,11 +78,11 @@ export class FakeSessionManager implements ISessionManager
         this.sessions.delete(sessionId);
     }
 
-    public async RevokeAllFor(tenant: Tenant, principalId: string): Promise<void>
+    public async RevokeAllFor(realm: Realm, principalId: string): Promise<void>
     {
         for (const [id, session] of [...this.sessions])
         {
-            if (session.PrincipalId === principalId && session.TenantId === tenant.Id)
+            if (session.PrincipalId === principalId && session.RealmId === realm.Id)
             {
                 this.sessions.delete(id);
             }
@@ -96,7 +96,7 @@ export class FakePrincipalDirectory implements IPrincipalDirectory
     {
     }
 
-    public async Lookup(principalId: string, _tenant: Tenant): Promise<Principal | null>
+    public async Lookup(principalId: string, _realm: Realm): Promise<Principal | null>
     {
         return principalId === this.principal.Id ? this.principal : null;
     }
@@ -111,7 +111,7 @@ export class FakeRoleGrantStore implements IRoleGrantStore
 {
     private readonly grants: Grant[] = [];
 
-    public async GrantsFor(subject: string, _tenant: Tenant): Promise<readonly Grant[]>
+    public async GrantsFor(subject: string, _realm: Realm): Promise<readonly Grant[]>
     {
         return this.grants.filter((g) => g.Subject === subject);
     }
@@ -140,7 +140,7 @@ export class FakeRoleGrantStore implements IRoleGrantStore
 
     private static SameResource(a: ResourceRef, b: ResourceRef): boolean
     {
-        return a.Kind === b.Kind && a.TenantId === b.TenantId && a.Path.length === b.Path.length && a.Path.every((p, i) => p === b.Path[i]);
+        return a.Kind === b.Kind && a.RealmId === b.RealmId && a.Path.length === b.Path.length && a.Path.every((p, i) => p === b.Path[i]);
     }
 }
 
@@ -208,7 +208,7 @@ export class FakeIdentityProviderRegistry implements IIdentityProviderRegistry
     {
     }
 
-    public async PackFor(_tenant: Tenant): Promise<IIdentityProviderPack>
+    public async PackFor(_realm: Realm): Promise<IIdentityProviderPack>
     {
         return this.pack;
     }
@@ -219,11 +219,11 @@ export class FakeIdentityProviderRegistry implements IIdentityProviderRegistry
     }
 }
 
-export class FakeTenant
+export class FakeRealm
 {
-    public static Saas(): Tenant
+    public static Saas(): Realm
     {
-        return new Tenant("t1", TenantKind.Saas, "Acme");
+        return new Realm("t1", RealmKind.Saas, "Acme");
     }
 }
 
@@ -235,7 +235,7 @@ export class FakeIdpDirectorySource implements IIdpDirectorySource
     {
     }
 
-    public async Snapshot(_tenant: Tenant, request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>
+    public async Snapshot(_realm: Realm, request: IdpDirectoryRequest): Promise<IdpDirectorySnapshot>
     {
         this.LastRequest = request;
         return this.snapshot;

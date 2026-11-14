@@ -2,10 +2,10 @@ import type { ResourceRef } from "../core/resource-ref.js";
 
 export class ResourceScope
 {
-    /** True iff `grant` is an ancestor-or-equal of `target`: same tenant and grant.Path is an element-wise prefix of target.Path. */
+    /** True iff `grant` is an ancestor-or-equal of `target`: same realm and grant.Path is an element-wise prefix of target.Path. */
     public static Covers(grant: ResourceRef, target: ResourceRef): boolean
     {
-        if (grant.TenantId !== target.TenantId)
+        if (grant.RealmId !== target.RealmId)
         {
             return false;
         }
