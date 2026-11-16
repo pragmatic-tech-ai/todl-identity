@@ -1,6 +1,10 @@
 {
   "name": "@pragmatic-tech-ai/todl-identity",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pragmatic-tech-ai/todl-identity.git"
+  },
   "license": "Apache-2.0",
   "description": "Identity management contracts for the TODL engine: principal/tenant/session value types and swappable provider-pack seams.",
   "type": "module",
