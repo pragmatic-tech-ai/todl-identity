@@ -19,6 +19,7 @@ export enum Role
     Admin,
     Owner,
     Maker,
+    Developer,
 }
 
 export enum Action
