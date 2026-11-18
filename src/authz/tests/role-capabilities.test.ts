@@ -31,3 +31,13 @@ test("contribute hierarchy", () =>
     assert.equal(RoleCapabilities.Covers(Role.Viewer, Action.Contribute), false);
     assert.equal(RoleCapabilities.Covers(Role.Editor, Action.Contribute), false);
 });
+
+test("developer covers read, write and contribute only", () =>
+{
+    assert.equal(RoleCapabilities.Covers(Role.Developer, Action.Read), true);
+    assert.equal(RoleCapabilities.Covers(Role.Developer, Action.Write), true);
+    assert.equal(RoleCapabilities.Covers(Role.Developer, Action.Contribute), true);
+    assert.equal(RoleCapabilities.Covers(Role.Developer, Action.Delete), false);
+    assert.equal(RoleCapabilities.Covers(Role.Developer, Action.Administer), false);
+    assert.equal(RoleCapabilities.Covers(Role.Developer, Action.Connect), false);
+});
